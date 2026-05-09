@@ -1,0 +1,90 @@
+L1 N003 0 10 Rser=1m
+L2 0 N004 0.01 Rser=1m
+V1 N003 0 SINE(0 325 50 0 0 0 0)
+L4 N003 0 10 Rser=1m
+L5 N007 0 0.0047 Rser=1m
+L3 N005 0 0.01 Rser=1m
+D1 N004 N001 1N4007
+D2 N006 N004 1N4007
+D3 N005 N001 1N4007
+D4 N006 N005 1N4007
+C5 N002 0 0.1u V=16
+C6 0 N008 0.1u V=16
+R1 N002 P001 10k
+R2 0 P002 10k
+D5 P001 0 1N4007
+D6 P002 N008 1N4007
+R3 N009 N007 100k
+R4 N010 N009 100k
+X§U3 N010 N011 N002 N008 N011 level2 Avol=1Meg GBW=10Meg Slew=10Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg ;§pnba In+)In-)V+)V-)OUT
+R6 N010 0 10k
+C1 N001 0 1000u V=25
+C2 0 N006 1000u V=25
+C3 N002 0 100u V=15
+C4 0 N008 100u V=15
+R7 N003 N012 2k
+R8 N003 N021 1.5k
+R9 N033 N003 2k
+R10 N038 N003 2.5k
+X§U4 N012 N012 0 0 0 N016 N014 N002 ACS712_20A ;§pnba 1)2)3)4)5)6)7)8
+X§U5 N021 N021 0 0 0 N030 N019 N002 ACS712_20A ;§pnba 1)2)3)4)5)6)7)8
+X§U6 N033 N033 0 0 0 N036 N020 N002 ACS712_20A ;§pnba 1)2)3)4)5)6)7)8
+X§U7 N038 N038 0 0 0 N040 N022 N002 ACS712_20A ;§pnba 1)2)3)4)5)6)7)8
+C7 N002 0 0.1u V=16
+C8 N002 0 0.1u V=16
+C9 N002 0 0.1u V=16
+C10 N002 0 0.1u V=16
+C11 N016 0 1n
+C12 N030 0 1n
+C13 N036 0 1n
+C14 N040 0 1n
+X§U8 0 N013 N002 0 0 0 N023 N014 N019 N020 N022 0 0 0 0 N039 DG408 ;§pnba GND)V+)EN)A0)A1)A2)D)S1)S2)S3)S4)S5)S6)S7)S8)V-
+R5 N002 0 10k
+X§U9 N023 N024 N002 N008 N024 level2 Avol=1Meg GBW=10Meg Slew=10Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg ;§pnba In+)In-)V+)V-)OUT
+X§U10 N025 N028 N002 N008 N017 level2 Avol=1Meg GBW=10Meg Slew=10Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg ;§pnba In+)In-)V+)V-)OUT
+X§U11 N018 N026 N002 N008 N026 level2 Avol=1Meg GBW=10Meg Slew=10Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg ;§pnba In+)In-)V+)V-)OUT
+R11 N025 N024 10k
+R12 N028 N034 10k
+R13 N037 N002 1k
+R14 0 N037 1k
+R15 N028 N017 10k
+R16 N018 N017 100k
+R17 N018 0 2k
+X§U12 N027 N031 N032 N035 0 NC_01 NC_02 N029 MCP39F521 ;§pnba 1)2)3)4)5)6)7)8
+L6 N026 P003 10u Rser=1m
+R18 N027 P003 1k
+L7 0 P004 10u Rser=1m
+R19 N031 P004 1k
+C16 N031 0 33n
+L8 N011 P005 10u Rser=1m
+R20 N032 P005 1k
+C17 N032 0 33n
+L9 0 P006 10u Rser=1m
+R21 N035 P006 1k
+C18 N035 0 33n
+C15 N027 0 33n
+V3 N013 0 15
+V5 0 N039 15
+R22 0 N025 10k
+V7 N029 0 3.3
+X§U1 0 N002 N001 LT1085-5 ;§pnba GND)OUT)IN
+X§U2 N006 NC_03 N008 N008 0 N006 NC_04 LT1175-5 ;§pnba Vin)Ilim2)Output)Sense)GND)_SHDN)Ilim4
+X§U13 N037 N034 N002 N008 N034 level2 Avol=1Meg GBW=10Meg Slew=10Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg ;§pnba In+)In-)V+)V-)OUT
+.model D D
+.lib C:\Users\Administrator\AppData\Local\LTspice\lib\cmp\standard.dio
+K1 L1 L2 L3 0.99
+K2 L4 L5 0.99
+.include ACS712.lib
+.include mcp.lib
+.tran 20
+.meas TRAN P_000001 AVG V(N032)*V(N027) FROM 1 TO 10
+* Library below included based on ModelFile attribute of instance X§U8 (C:\Users\Administrator\AppData\Local\LTspice\lib\sym\Switches\DG408.asy)
+.lib DG408.sub
+* Library below included based on ModelFile attribute of instance X§U1 (C:\Users\Administrator\AppData\Local\LTspice\lib\sym\PowerProducts\LT1085-5.asy)
+.lib LT1083.lib
+* Library below included based on ModelFile attribute of instance X§U2 (C:\Users\Administrator\AppData\Local\LTspice\lib\sym\PowerProducts\LT1175-5.asy)
+.lib LT1175-5.sub
+* Library below included based on ModelFile attribute of instance X§U3, X§U9, X§U10, X§U11, X§U13 (C:\Users\Administrator\AppData\Local\LTspice\lib\sym\OpAmps\UniversalOpAmp2.asy)
+.lib UniversalOpAmp2.lib
+.backanno
+.end

@@ -1,0 +1,14 @@
+.SUBCKT MCP39F521 1 2 3 4 5 6 7 8
+* 1 V1+
+* 2 V1-
+* 3 I1+
+* 4 I1-
+* 5 DGND
+* 6 NC
+* 7 NC
+* 8 NC
+
+R_volt_in 1 2 10Meg
+R_curr_in 3 4 10Meg
+
+.ENDS

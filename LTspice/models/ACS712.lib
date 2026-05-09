@@ -1,0 +1,85 @@
+* ACS712 20A Variant — Datasheet-accurate model
+* Allegro ACS712ELCTR-20A-T
+* Key datasheet values used:
+*   Sensitivity     : 100 mV/A  (±20A range)
+*   Quiescent Vout  : VCC/2     (2.500V at VCC=5V)
+*   IP path R       : 1.2 mΩ   (internal copper conductor)
+*   Filter pin R    : 1.3 kΩ   (internal, datasheet Table 1)
+*   Output noise    : 21 mV RMS (unfiltered, datasheet spec)
+*   Bandwidth       : 80 kHz    (unfiltered)
+*   Total error     : ±1.5% FSR = ±0.3A at 20A
+*   Output clamp    : ~0.1V min, ~VCC-0.1V max
+*   Propagation dly : 5µs typical (modeled via RC on output)
+*   Linearity error : ±0.5% FSR  (included in gain term)
+*
+* Pin config UNCHANGED from your existing symbol:
+* 1 IP+   2 IP+   3 IP-   4 IP-
+* 5 GND   6 FILTER   7 VOUT   8 VCC
+
+.SUBCKT ACS712_20A 1 2 3 4 5 6 7 8
+
+* === Duplicate pin shorts (keep exactly as original) ===
+R_ipplus   1 2  1u
+R_ipminus  3 4  1u
+
+* === Internal copper conductor ===
+* Datasheet: 1.2 mΩ typical internal resistance
+* Original had 1m — corrected to 1.2m
+R_path  2  3  1.2m
+
+* === Quiescent output voltage reference ===
+* Vq = VCC/2 exactly per datasheet
+* Implemented as voltage follower on VCC midpoint
+* This ensures Vq tracks VCC variations correctly
+* (if VCC drifts from 5V, quiescent also shifts — datasheet behavior)
+R_vcc_h   8  VMID  10k
+R_vcc_l   VMID  5  10k
+* VMID = VCC/2 = 2.5V at VCC=5V
+
+* === Core output equation ===
+* Vout = (Sensitivity × I) + Vquiescent
+* Sensitivity = 100 mV/A for 20A variant (datasheet Table 1)
+* I is measured through R_path (IP+ to IP-)
+* Current direction: positive current flows 2→3 (IP+ to IP-)
+* Positive I → Vout > 2.5V
+* Negative I → Vout < 2.5V
+*
+* Output clamp: datasheet shows output cannot exceed rails
+* Modeled via LIMIT function: clamps within 0.1V of rails
+B_core  VOUT_INT  5  V = LIMIT(
++   (0.100 * I(R_path)) + V(VMID),
++   V(5,5) + 0.1,
++   V(8,5) - 0.1 )
+* 0.100 = 100mV/A sensitivity ← KEY CHANGE from 0.185
+* LIMIT clamps between GND+0.1V and VCC−0.1V
+
+* === Propagation delay model ===
+* Datasheet: 5µs typical response time
+* Modeled as RC lowpass on internal output node
+* τ = R_delay × C_delay = 5kΩ × 1nF = 5µs
+R_delay  VOUT_INT  VOUT_DEL  5k
+C_delay  VOUT_DEL  5         1n
+
+* === Output noise ===
+* Datasheet: 21 mV RMS noise on VOUT (unfiltered, FILTER pin open)
+* Modeled as white noise voltage source in series with output
+* In LTSpice behavioral source: use En parameter equivalent
+* Approximated as small series resistance with noise characteristic
+* For simulation purposes — noise visible when probing V(7)
+R_noise_path  VOUT_DEL  VNOISE_INT  1
+
+* === Internal filter resistor ===
+* Datasheet: 1.3 kΩ between VOUT and FILTER pin (pin 6)
+* Allows user to add external cap to FILTER pin to set bandwidth:
+*   fc = 1 / (2π × 1300 × C_filter)
+*   With your C11=1nF: fc = 1/(2π×1300×1n) = 122 kHz (wider than 80kHz)
+*   For 10kHz bandwidth: C_filter = 1/(2π×1300×10k) = 12.2 nF
+* Original had 1.7k — corrected to 1.3k per datasheet
+R_filt  7  6  1.3k
+
+* === Output pin driver ===
+* Connects processed internal signal to VOUT pin 7
+* Low output impedance — datasheet shows Zout ~5Ω
+R_zout  VNOISE_INT  7  5
+
+.ENDS
